@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OceanLoop AI</title>
+  <style>
+    :root {
+      --teal-900: #0d3d38;
+      --teal-700: #0f6b5c;
+      --teal-600: #12806d;
+      --teal-500: #159b83;
+      --teal-100: #e3f3ef;
+      --teal-50: #f2f9f7;
+      --ink: #16241f;
+      --gray-600: #5b6b66;
+      --gray-400: #8fa39d;
+      --line: #e4ece9;
+      --bg: #f6f9f8;
+      --white: #ffffff;
+      --amber: #e0a531;
+      --red: #e2554a;
+      --blue: #3a6ea5;
+      --purple: #7a6fc4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      background: #dfe7e4;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px 8px;
+    }
+
+    .phone {
+      width: 390px;
+      max-width: 100%;
+      background: var(--bg);
+      border-radius: 40px;
+      box-shadow: 0 30px 60px rgba(13, 61, 56, 0.25), 0 0 0 10px #1b1b1b;
+      overflow: hidden;
+      position: relative;
+      height: 844px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .statusbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 22px 6px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 26px;
+      background: #1b1b1b;
+      border-radius: 0 0 16px 16px;
+      z-index: 20;
+    }
+
+    .screens {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(16px);
+      transition: opacity .25s ease, transform .25s ease;
+      padding-bottom: 100px;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px 4px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, var(--teal-500), var(--teal-100), var(--teal-500));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .logo::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg);
+    }
+
+    .brand-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--teal-700);
+      letter-spacing: -0.3px;
+    }
+
+    .bell-btn {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--white);
+      border: 1px solid var(--line);
+      cursor: pointer;
+    }
+
+    .badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      border: 2px solid var(--bg);
+    }
+
+    /* HOME */
+    .hero {
+      margin: 6px 20px 0;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(120deg, #eaf6f2, #dcefe8);
+      padding: 16px 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hero-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      background: linear-gradient(160deg, #cfe6df, #9fc9bd);
+      flex-shrink: 0;
+    }
+
+    .avatar svg,
+    .p-avatar svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero-greet {
+      font-size: 12.5px;
+      color: var(--gray-600);
+    }
+
+    .hero-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--ink);
+      margin: 2px 0 4px;
+    }
+
+    .hero-loc {
+      font-size: 12px;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .boat {
+      font-size: 34px;
+      opacity: 0.9;
+    }
+
+    .wallet-card {
+      margin: 16px 20px 0;
+      border-radius: 20px;
+      padding: 22px 22px 20px;
+      background: linear-gradient(135deg, var(--teal-700), var(--teal-500));
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .wallet-card::after {
+      content: "";
+      position: absolute;
+      right: -30px;
+      bottom: -30px;
+      width: 140px;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    .wallet-label {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .wallet-amount {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 6px 0 14px;
+      letter-spacing: -0.5px;
+    }
+
+    .wallet-link {
+      font-size: 13.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grid6 {
+      margin: 18px 20px 0;
+      background: var(--white);
+      border-radius: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      box-shadow: 0 2px 10px rgba(13, 61, 56, 0.05);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .grid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 18px 6px;
+      cursor: pointer;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      transition: background .15s;
+    }
+
+    .grid-item:nth-child(3n) {
+      border-right: none;
+    }
+
+    .grid-item:nth-child(n+4) {
+      border-bottom: none;
+    }
+
+    .grid-item:active {
+      background: var(--teal-50);
+    }
+
+    .grid-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: var(--teal-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .grid-label {
+      font-size: 12.5px;
+      text-align: center;
+      color: var(--ink);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .news-card {
+      margin: 18px 20px 0;
+      background: var(--white);
+      border-radius: 18px;
+      padding: 16px 18px 12px;
+      border: 1px solid var(--line);
+    }
+
+    .news-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .news-title {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .news-seeall {
+      font-size: 12.5px;
+      color: var(--teal-600);
+      font-weight: 700;
+    }
+
+    .news-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .news-emoji {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--teal-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .news-body-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .news-body-sub {
+      font-size: 12.5px;
+      color: var(--gray-600);
+      line-height: 1.4;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin: 14px 0 4px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--line);
+    }
+
+    .dot.on {
+      background: var(--teal-600);
+      width: 16px;
+      border-radius: 3px;
+    }
+
+    /* COLLECTION SCREEN */
+    .page-title {
+      padding: 14px 20px 0;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .page-sub {
+      padding: 2px 20px 0;
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+
+    .banner {
+      margin: 16px 20px 0;
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      background: var(--teal-50);
+      border: 1px solid var(--line);
+    }
+
+    .banner-img {
+      width: 120px;
+      flex-shrink: 0;
+      background: linear-gradient(160deg, #4f7c93, #1e4a5f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+    }
+
+    .banner-body {
+      padding: 14px 14px;
+      flex: 1;
+    }
+
+    .banner-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal-700);
+    }
+
+    .banner-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink);
+      margin: 2px 0;
+    }
+
+    .banner-sub {
+      font-size: 12px;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+    }
+
+    .banner-btn {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal-700);
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--line);
+    }
+
+    .section-label {
+      padding: 18px 20px 0;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .help-link {
+      font-size: 12.5px;
+      color: var(--teal-600);
+      font-weight: 700;
+    }
+
+    .waste-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 12px 20px 0;
+    }
+
+    .waste-item {
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .waste-item.selected {
+      border-color: var(--teal-500);
+      background: var(--teal-50);
+    }
+
+    .waste-emoji {
+      font-size: 22px;
+    }
+
+    .waste-name {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .waste-sub {
+      font-size: 9.5px;
+      color: var(--gray-600);
+      text-align: center;
+    }
+
+    .field-label {
+      padding: 18px 20px 6px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .qty-box {
+      margin: 0 20px;
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+    }
+
+    .qty-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--teal-50);
+      color: var(--teal-700);
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+    }
+
+    .qty-val {
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .select-box {
+      margin: 0 20px;
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .select-box .arrow {
+      margin-left: auto;
+      color: var(--gray-400);
+    }
+
+    .loc-box {
+      margin: 0 20px;
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .loc-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .loc-sub {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    .primary-btn {
+      margin: 20px 20px 4px;
+      background: var(--teal-700);
+      color: #fff;
+      text-align: center;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(15, 107, 92, 0.3);
+    }
+
+    .primary-btn:active {
+      transform: scale(.98);
+    }
+
+    /* SCAN SCREEN */
+    .scan-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px 0;
+    }
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .scan-title {
+      font-size: 17px;
+      font-weight: 800;
+      flex: 1;
+      text-align: center;
+      margin-right: 36px;
+    }
+
+    .scan-instr {
+      text-align: center;
+      font-size: 14px;
+      color: var(--gray-600);
+      padding: 20px 40px 0;
+      line-height: 1.5;
+    }
+
+    .qr-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 36px 30px 0;
+    }
+
+    .qr-frame {
+      position: relative;
+      width: 260px;
+      height: 260px;
+    }
+
+    .corner {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-color: var(--teal-500);
+    }
+
+    .corner.tl {
+      top: 0;
+      left: 0;
+      border-top: 4px solid;
+      border-left: 4px solid;
+      border-radius: 12px 0 0 0;
+    }
+
+    .corner.tr {
+      top: 0;
+      right: 0;
+      border-top: 4px solid;
+      border-right: 4px solid;
+      border-radius: 0 12px 0 0;
+    }
+
+    .corner.bl {
+      bottom: 0;
+      left: 0;
+      border-bottom: 4px solid;
+      border-left: 4px solid;
+      border-radius: 0 0 0 12px;
+    }
+
+    .corner.br {
+      bottom: 0;
+      right: 0;
+      border-bottom: 4px solid;
+      border-right: 4px solid;
+      border-radius: 0 0 12px 0;
+    }
+
+    .qr-img {
+      position: absolute;
+      inset: 20px;
+      background: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: var(--teal-500);
+      box-shadow: 0 0 8px var(--teal-500);
+      animation: scan 2.2s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      0% {
+        top: 24px;
+      }
+
+      50% {
+        top: 236px;
+      }
+
+      100% {
+        top: 24px;
+      }
+    }
+
+    .manual-link {
+      text-align: center;
+      margin-top: 34px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--teal-600);
+      cursor: pointer;
+    }
+
+    /* NOTIFICATIONS */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px 20px 0;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--white);
+      border: 1px solid var(--line);
+      color: var(--gray-600);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--teal-50);
+      color: var(--teal-700);
+      border-color: var(--teal-100);
+    }
+
+    .tab .rdot {
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 4px;
+    }
+
+    .notif-item {
+      margin: 12px 20px 0;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+
+    .notif-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .notif-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .notif-body {
+      font-size: 12.5px;
+      color: var(--gray-600);
+      line-height: 1.4;
+    }
+
+    .notif-time {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 6px;
+    }
+
+    .notif-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 16px;
+    }
+
+    .rdot2 {
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+    }
+
+    .rdot2.off {
+      background: var(--line);
+    }
+
+    /* ACCOUNT */
+    .profile-card {
+      margin: 16px 20px 0;
+      background: var(--teal-50);
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid var(--teal-100);
+    }
+
+    .profile-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .p-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: linear-gradient(160deg, #cfe6df, #9fc9bd);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .p-name {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .p-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--teal-100);
+      color: var(--teal-700);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin: 4px 0;
+    }
+
+    .p-line {
+      font-size: 12.5px;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+    }
+
+    .p-arrow {
+      margin-left: auto;
+      color: var(--gray-400);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--teal-100);
+      margin: 14px 0;
+    }
+
+    .balance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bal-amount {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--teal-700);
+    }
+
+    .withdraw-btn {
+      background: var(--teal-700);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .stats-card {
+      margin: 16px 20px 0;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .stats-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .stat-val {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .stat-lbl {
+      font-size: 9.5px;
+      color: var(--gray-600);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    .menu-card {
+      margin: 16px 20px 0;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-ico {
+      font-size: 18px;
+      width: 22px;
+      text-align: center;
+    }
+
+    .menu-arrow {
+      margin-left: auto;
+      color: var(--gray-400);
+    }
+
+    .logout {
+      margin: 18px 20px 0;
+      text-align: center;
+      padding: 15px;
+      background: var(--teal-50);
+      border-radius: 14px;
+      color: var(--teal-700);
+      font-weight: 700;
+      font-size: 14.5px;
+      cursor: pointer;
+    }
+
+    /* BOTTOM NAV */
+    .bottomnav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 8px 6px 10px;
+      z-index: 10;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      color: var(--gray-400);
+      font-size: 10.5px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .nav-item.active {
+      color: var(--teal-700);
+    }
+
+    .nav-ico {
+      font-size: 20px;
+    }
+
+    .nav-scan {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--teal-700);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-top: -26px;
+      box-shadow: 0 6px 16px rgba(15, 107, 92, 0.4);
+      border: 4px solid #fff;
+    }
+
+    .nav-item.scan-nav.active .nav-scan {
+      background: var(--teal-500);
+    }
+
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 5px;
+      background: #1b1b1b;
+      border-radius: 3px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span>9:41</span>
+      <span>📶 📡 🔋</span>
+    </div>
+
+    <div class="screens">
+
+      <!-- HOME -->
+      <div class="screen active" id="screen-home">
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo"></div>
+            <div class="brand-name">OceanLoop AI</div>
+          </div>
+          <div class="bell-btn" onclick="go('notif')">🔔<span class="badge">3</span></div>
+        </div>
+
+        <div class="hero">
+          <div class="hero-left">
+            <div class="avatar">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <clipPath id="clipHome">
+                    <circle cx="50" cy="50" r="50" />
+                  </clipPath>
+                  <linearGradient id="skyHome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#dff2ec" />
+                    <stop offset="100%" stop-color="#a9d6c8" />
+                  </linearGradient>
+                </defs>
+                <g clip-path="url(#clipHome)">
+                  <rect width="100" height="100" fill="url(#skyHome)" />
+                  <rect y="66" width="100" height="34" fill="#0f6b5c" />
+                  <path d="M50 40 C33 40 24 55 24 68 L76 68 C76 55 67 40 50 40 Z" fill="#e2b976" />
+                  <ellipse cx="50" cy="38" rx="32" ry="8" fill="#e2b976" />
+                  <ellipse cx="50" cy="38" rx="32" ry="8" fill="none" stroke="#c99a52" stroke-width="1.5" />
+                  <circle cx="50" cy="58" r="18" fill="#e8b48a" />
+                  <path d="M32 55 C32 45 40 38 50 38 C60 38 68 45 68 55 L64 55 C63 47 57 42 50 42 C43 42 37 47 36 55 Z"
+                    fill="#3a2a1f" />
+                  <circle cx="43" cy="59" r="2.1" fill="#2a1c14" />
+                  <circle cx="57" cy="59" r="2.1" fill="#2a1c14" />
+                  <path d="M44 67 Q50 71 56 67" stroke="#2a1c14" stroke-width="2" fill="none" stroke-linecap="round" />
+                  <path d="M28 100 C28 84 37 76 50 76 C63 76 72 84 72 100 Z" fill="#3f6b7a" />
+                  <path d="M28 100 C28 84 37 76 50 76" stroke="#345a67" stroke-width="2" fill="none" />
+                </g>
+              </svg>
+            </div>
+            <div>
+              <div class="hero-greet">Xin chào,</div>
+              <div class="hero-name">Ngư dân Văn Hải</div>
+              <div class="hero-loc">📍 Bãi Bắc, Phú Quốc</div>
+            </div>
+          </div>
+          <div class="boat">⛵</div>
+        </div>
+
+        <div class="wallet-card" onclick="go('account')">
+          <div class="wallet-label">Số dư ví OceanLoop</div>
+          <div class="wallet-amount">1.248.700 đ</div>
+          <div class="wallet-link">Lịch sử giao dịch →</div>
+        </div>
+
+        <div class="grid6">
+          <div class="grid-item" onclick="go('collect')">
+            <div class="grid-icon">🛍️</div>
+            <div class="grid-label">Đăng ký<br>thu gom</div>
+          </div>
+          <div class="grid-item" onclick="go('collect')">
+            <div class="grid-icon">📋</div>
+            <div class="grid-label">Lịch sử<br>thu gom</div>
+          </div>
+          <div class="grid-item">
+            <div class="grid-icon">📍</div>
+            <div class="grid-label">Điểm thu<br>gần tôi</div>
+          </div>
+          <div class="grid-item">
+            <div class="grid-icon">♻️</div>
+            <div class="grid-label">Hướng dẫn<br>phân loại</div>
+          </div>
+          <div class="grid-item" onclick="go('notif')">
+            <div class="grid-icon">🔔</div>
+            <div class="grid-label">Thông báo</div>
+          </div>
+          <div class="grid-item">
+            <div class="grid-icon">🎧</div>
+            <div class="grid-label">Hỗ trợ</div>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-head">
+            <div class="news-title">Tin mới</div>
+            <div class="news-seeall">Xem tất cả →</div>
+          </div>
+          <div class="news-item">
+            <div class="news-emoji">🎁</div>
+            <div>
+              <div class="news-body-title">Chương trình thưởng tháng 5</div>
+              <div class="news-body-sub">Thu gom đủ 50kg nhựa sẽ được thưởng 50.000đ.</div>
+            </div>
+          </div>
+          <div class="dots"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span
+              class="dot"></span></div>
+        </div>
+      </div>
+
+      <!-- COLLECTION -->
+      <div class="screen" id="screen-collect">
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo"></div>
+            <div class="brand-name">OceanLoop AI</div>
+          </div>
+          <div class="bell-btn" onclick="go('notif')">🔔<span class="badge">2</span></div>
+        </div>
+        <div class="page-title">Thu gom</div>
+        <div class="page-sub">Đăng ký và quản lý các lần thu gom rác thải</div>
+
+        <div class="banner">
+          <div class="banner-img">🎣</div>
+          <div class="banner-body">
+            <div class="banner-label">Thu gom hôm nay</div>
+            <div class="banner-value">32.5 kg</div>
+            <div class="banner-sub">2 lần thu gom</div>
+            <div class="banner-btn">Xem lịch sử →</div>
+          </div>
+        </div>
+
+        <div class="section-label">Đăng ký thu gom <span class="help-link">? Hướng dẫn</span></div>
+        <div class="waste-grid" id="wasteGrid">
+          <div class="waste-item selected" data-i="0">
+            <div class="waste-emoji">🧴</div>
+            <div class="waste-name">Nhựa cứng</div>
+            <div class="waste-sub">HDPE, PP</div>
+          </div>
+          <div class="waste-item" data-i="1">
+            <div class="waste-emoji">🛍️</div>
+            <div class="waste-name">Nhựa mềm</div>
+            <div class="waste-sub">PE, Túi nilon</div>
+          </div>
+          <div class="waste-item" data-i="2">
+            <div class="waste-emoji">💧</div>
+            <div class="waste-name">Chai PET</div>
+            <div class="waste-sub">Chai nước suối</div>
+          </div>
+          <div class="waste-item" data-i="3">
+            <div class="waste-emoji">🥫</div>
+            <div class="waste-name">Kim loại</div>
+            <div class="waste-sub">Lon, sắt, nhôm</div>
+          </div>
+          <div class="waste-item" data-i="4">
+            <div class="waste-emoji">🍾</div>
+            <div class="waste-name">Thủy tinh</div>
+            <div class="waste-sub">Chai, lọ</div>
+          </div>
+          <div class="waste-item" data-i="5">
+            <div class="waste-emoji">📦</div>
+            <div class="waste-name">Giấy</div>
+            <div class="waste-sub">Giấy, bìa</div>
+          </div>
+          <div class="waste-item" data-i="6">
+            <div class="waste-emoji">🕸️</div>
+            <div class="waste-name">Lưới cũ</div>
+            <div class="waste-sub">Lưới đánh cá</div>
+          </div>
+          <div class="waste-item" data-i="7">
+            <div class="waste-emoji">🧺</div>
+            <div class="waste-name">Khác</div>
+            <div class="waste-sub">Vật liệu khác</div>
+          </div>
+        </div>
+
+        <div class="field-label">Khối lượng dự kiến (kg)</div>
+        <div class="qty-box">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <div class="qty-val"><span id="qtyVal">10</span> kg</div>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+
+        <div class="field-label">Thời gian mong muốn</div>
+        <div class="select-box">📅 Ngày mai, 08:00 - 10:00 <span class="arrow">⌄</span></div>
+
+        <div class="field-label">Điểm giao gần nhất</div>
+        <div class="loc-box">
+          <span>📍</span>
+          <div>
+            <div class="loc-title">Bãi Bắc, Phú Quốc</div>
+            <div class="loc-sub">Cách bạn 1.2 km</div>
+          </div>
+          <span class="p-arrow">›</span>
+        </div>
+
+        <div class="primary-btn" onclick="go('scan')">Tiếp tục</div>
+      </div>
+
+      <!-- SCAN -->
+      <div class="screen" id="screen-scan">
+        <div class="scan-header">
+          <div class="back-btn" onclick="go('collect')">←</div>
+          <div class="scan-title">Quét mã giao dịch</div>
+        </div>
+        <div class="scan-instr">Hướng camera vào mã QR<br>trên bao/rác tại điểm thu gom</div>
+        <div class="qr-wrap">
+          <div class="qr-frame">
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+            <div class="qr-img">
+              <svg width="180" height="180" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg">
+                <rect width="29" height="29" fill="#fff" />
+                <g fill="#111">
+                  <rect x="0" y="0" width="7" height="7" />
+                  <rect x="1.5" y="1.5" width="4" height="4" fill="#fff" />
+                  <rect x="2.7" y="2.7" width="1.6" height="1.6" fill="#111" />
+                  <rect x="22" y="0" width="7" height="7" />
+                  <rect x="23.5" y="1.5" width="4" height="4" fill="#fff" />
+                  <rect x="24.7" y="2.7" width="1.6" height="1.6" fill="#111" />
+                  <rect x="0" y="22" width="7" height="7" />
+                  <rect x="1.5" y="23.5" width="4" height="4" fill="#fff" />
+                  <rect x="2.7" y="24.7" width="1.6" height="1.6" fill="#111" />
+                  <rect x="9" y="1" width="1.4" height="1.4" />
+                  <rect x="12" y="1" width="1.4" height="1.4" />
+                  <rect x="15" y="2" width="1.4" height="1.4" />
+                  <rect x="10" y="4" width="1.4" height="1.4" />
+                  <rect x="13" y="4" width="1.4" height="1.4" />
+                  <rect x="17" y="4" width="1.4" height="1.4" />
+                  <rect x="9" y="9" width="1.4" height="1.4" />
+                  <rect x="11" y="9" width="1.4" height="1.4" />
+                  <rect x="14" y="10" width="1.4" height="1.4" />
+                  <rect x="16" y="9" width="1.4" height="1.4" />
+                  <rect x="9" y="12" width="1.4" height="1.4" />
+                  <rect x="12" y="12" width="1.4" height="1.4" />
+                  <rect x="15" y="12" width="1.4" height="1.4" />
+                  <rect x="18" y="13" width="1.4" height="1.4" />
+                  <rect x="10" y="15" width="1.4" height="1.4" />
+                  <rect x="13" y="15" width="1.4" height="1.4" />
+                  <rect x="16" y="16" width="1.4" height="1.4" />
+                  <rect x="20" y="9" width="1.4" height="1.4" />
+                  <rect x="22" y="10" width="1.4" height="1.4" />
+                  <rect x="20" y="13" width="1.4" height="1.4" />
+                  <rect x="9" y="18" width="1.4" height="1.4" />
+                  <rect x="12" y="18" width="1.4" height="1.4" />
+                  <rect x="15" y="19" width="1.4" height="1.4" />
+                  <rect x="18" y="18" width="1.4" height="1.4" />
+                  <rect x="21" y="19" width="1.4" height="1.4" />
+                  <rect x="9" y="21" width="1.4" height="1.4" />
+                  <rect x="12" y="21" width="1.4" height="1.4" />
+                  <rect x="15" y="22" width="1.4" height="1.4" />
+                  <rect x="18" y="21" width="1.4" height="1.4" />
+                  <rect x="21" y="9" width="1.4" height="1.4" />
+                  <rect x="22" y="20" width="4" height="4" />
+                  <rect x="23" y="21" width="2" height="2" fill="#fff" />
+                  <rect x="9" y="24" width="1.4" height="1.4" />
+                  <rect x="12" y="25" width="1.4" height="1.4" />
+                  <rect x="15" y="24" width="1.4" height="1.4" />
+                  <rect x="18" y="25" width="1.4" height="1.4" />
+                </g>
+              </svg>
+            </div>
+            <div class="scan-line"></div>
+          </div>
+        </div>
+        <div class="manual-link" onclick="go('home')">Hoặc nhập mã bằng tay</div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="screen" id="screen-notif">
+        <div class="topbar">
+          <div class="brand-name" style="font-size:24px;">Thông báo</div>
+          <div class="bell-btn">⚙️</div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Tất cả</div>
+          <div class="tab">Chưa đọc<span class="rdot"></span></div>
+          <div class="tab">Đã đọc</div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:var(--teal-50);">💰</div>
+          <div style="flex:1;">
+            <div class="notif-title" style="color:var(--teal-700);">Thanh toán thành công</div>
+            <div class="notif-body">Bạn đã nhận được 125.000đ cho đơn thu gom ngày 20/05/2024.</div>
+            <div class="notif-time">08:30 - 20/05/2024</div>
+          </div>
+          <div class="notif-right">
+            <div class="rdot2"></div><span style="color:var(--gray-400);">›</span>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#fdf1de;">🚚</div>
+          <div style="flex:1;">
+            <div class="notif-title" style="color:var(--amber);">Đơn thu gom sắp đến</div>
+            <div class="notif-body">Đơn thu gom của bạn vào ngày mai (21/05/2024) từ 08:00 - 10:00.</div>
+            <div class="notif-time">19:15 - 20/05/2024</div>
+          </div>
+          <div class="notif-right">
+            <div class="rdot2"></div><span style="color:var(--gray-400);">›</span>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#e7edf7;">📣</div>
+          <div style="flex:1;">
+            <div class="notif-title" style="color:var(--blue);">Thông báo từ OceanLoop</div>
+            <div class="notif-body">Chương trình thưởng tháng 5: Thu gom đủ 50kg nhựa sẽ được thưởng 50.000đ.</div>
+            <div class="notif-time">10:00 - 20/05/2024</div>
+          </div>
+          <div class="notif-right">
+            <div class="rdot2"></div><span style="color:var(--gray-400);">›</span>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:var(--teal-50);">✅</div>
+          <div style="flex:1;">
+            <div class="notif-title" style="color:var(--teal-700);">Xác nhận đơn thu gom</div>
+            <div class="notif-body">Đơn thu gom ngày 20/05/2024 của bạn đã được xác nhận.</div>
+            <div class="notif-time">09:00 - 20/05/2024</div>
+          </div>
+          <div class="notif-right">
+            <div class="rdot2 off"></div><span style="color:var(--gray-400);">›</span>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#ece9f7;">🔔</div>
+          <div style="flex:1;">
+            <div class="notif-title" style="color:var(--purple);">Cập nhật hệ thống</div>
+            <div class="notif-body">Ứng dụng OceanLoop AI đã cập nhật phiên bản mới. Trải nghiệm ngay!</div>
+            <div class="notif-time">16:45 - 19/05/2024</div>
+          </div>
+          <div class="notif-right">
+            <div class="rdot2 off"></div><span style="color:var(--gray-400);">›</span>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:var(--teal-50);">⭐</div>
+          <div style="flex:1;">
+            <div class="notif-title" style="color:var(--teal-700);">Chúc mừng!</div>
+            <div class="notif-body">Bạn đã đạt mốc 100kg thu gom trong tháng 5. Cảm ơn bạn vì hành động xanh!</div>
+            <div class="notif-time">11:20 - 19/05/2024</div>
+          </div>
+          <div class="notif-right">
+            <div class="rdot2 off"></div><span style="color:var(--gray-400);">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOUNT -->
+      <div class="screen" id="screen-account">
+        <div class="topbar">
+          <div class="brand-name" style="font-size:24px;">Tài khoản</div>
+          <div class="bell-btn">⚙️</div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="p-avatar">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <clipPath id="clipAcc">
+                    <circle cx="50" cy="50" r="50" />
+                  </clipPath>
+                  <linearGradient id="skyAcc" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#dff2ec" />
+                    <stop offset="100%" stop-color="#a9d6c8" />
+                  </linearGradient>
+                </defs>
+                <g clip-path="url(#clipAcc)">
+                  <rect width="100" height="100" fill="url(#skyAcc)" />
+                  <rect y="70" width="100" height="30" fill="#12806d" />
+                  <path d="M50 36 C31 36 21 53 21 67 L79 67 C79 53 69 36 50 36 Z" fill="#e6bd7d" />
+                  <ellipse cx="50" cy="34" rx="34" ry="8.5" fill="#e6bd7d" />
+                  <ellipse cx="50" cy="34" rx="34" ry="8.5" fill="none" stroke="#c99a52" stroke-width="1.5" />
+                  <circle cx="50" cy="57" r="19" fill="#e8b48a" />
+                  <path d="M31 54 C31 43 40 36 50 36 C60 36 69 43 69 54 L65 54 C64 45 58 40 50 40 C42 40 36 45 35 54 Z"
+                    fill="#2f231a" />
+                  <circle cx="42.5" cy="58" r="2.2" fill="#2a1c14" />
+                  <circle cx="57.5" cy="58" r="2.2" fill="#2a1c14" />
+                  <path d="M43 67 Q50 72 57 67" stroke="#2a1c14" stroke-width="2.2" fill="none"
+                    stroke-linecap="round" />
+                  <path d="M26 100 C26 82 36 74 50 74 C64 74 74 82 74 100 Z" fill="#2f5f6e" />
+                  <path d="M26 100 C26 82 36 74 50 74" stroke="#244a55" stroke-width="2" fill="none" />
+                </g>
+              </svg>
+            </div>
+            <div style="flex:1;">
+              <div class="p-name">Nguyễn Văn Biển</div>
+              <div class="p-tag">👤 Ngư dân</div>
+              <div class="p-line">📞 0987 654 321</div>
+              <div class="p-line">📍 Phú Quốc, Kiên Giang</div>
+            </div>
+            <div class="p-arrow">›</div>
+          </div>
+          <div class="divider"></div>
+          <div class="balance-row">
+            <div>
+              <div class="p-line" style="margin-bottom:4px;">👛 Số dư ví</div>
+              <div class="bal-amount">1.248.700đ 👁️</div>
+            </div>
+            <div class="withdraw-btn">Rút tiền</div>
+          </div>
+        </div>
+
+        <div class="stats-card">
+          <div class="stats-title">Thống kê của tôi</div>
+          <div class="stats-grid">
+            <div>
+              <div class="stat-icon" style="background:var(--teal-50);">🛍️</div>
+              <div class="stat-val">235 kg</div>
+              <div class="stat-lbl">Tổng khối lượng đã thu gom</div>
+            </div>
+            <div>
+              <div class="stat-icon" style="background:#e7edf7;">📋</div>
+              <div class="stat-val">28</div>
+              <div class="stat-lbl">Số đơn thu gom đã hoàn thành</div>
+            </div>
+            <div>
+              <div class="stat-icon" style="background:#fdf1de;">💰</div>
+              <div class="stat-val">1.248.700đ</div>
+              <div class="stat-lbl">Tổng tiền đã nhận</div>
+            </div>
+            <div>
+              <div class="stat-icon" style="background:var(--teal-50);">🌿</div>
+              <div class="stat-val">56 kg</div>
+              <div class="stat-lbl">Giảm CO₂ tương đương</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-card">
+          <div class="menu-item"><span class="menu-ico">👤</span>Thông tin cá nhân<span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item"><span class="menu-ico">👛</span>Ví của tôi<span class="menu-arrow">›</span></div>
+          <div class="menu-item"><span class="menu-ico">🕐</span>Lịch sử giao dịch<span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item"><span class="menu-ico">⭐</span>Thành tích &amp; Huy hiệu<span
+              class="menu-arrow">›</span></div>
+          <div class="menu-item"><span class="menu-ico">🛡️</span>Trung tâm bảo mật<span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item"><span class="menu-ico">🎧</span>Trung tâm hỗ trợ<span class="menu-arrow">›</span></div>
+          <div class="menu-item"><span class="menu-ico">ℹ️</span>Giới thiệu OceanLoop AI<span
+              class="menu-arrow">›</span></div>
+        </div>
+
+        <div class="logout">⇥ Đăng xuất</div>
+      </div>
+
+    </div>
+
+    <div class="bottomnav">
+      <div class="nav-item active" data-screen="home" onclick="go('home')"><span class="nav-ico">🏠</span>Trang chủ
+      </div>
+      <div class="nav-item" data-screen="collect" onclick="go('collect')"><span class="nav-ico">🛍️</span>Thu gom</div>
+      <div class="nav-item scan-nav" data-screen="scan" onclick="go('scan')">
+        <div class="nav-scan">▦</div>
+      </div>
+      <div class="nav-item" data-screen="notif" onclick="go('notif')"><span class="nav-ico">🔔</span>Thông báo</div>
+      <div class="nav-item" data-screen="account" onclick="go('account')"><span class="nav-ico">👤</span>Tài khoản</div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    function go(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+      document.getElementById('screen-' + name).scrollTop = 0;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const navBtn = document.querySelector('.nav-item[data-screen="' + name + '"]');
+      if (navBtn) navBtn.classList.add('active');
+    }
+
+    // waste type selection
+    document.querySelectorAll('.waste-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.waste-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+      });
+    });
+
+    // quantity stepper
+    let qty = 10;
+    function changeQty(delta) {
+      qty = Math.max(1, qty + delta);
+      document.getElementById('qtyVal').textContent = qty;
+    }
+
+    // notification tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+
+</html>
